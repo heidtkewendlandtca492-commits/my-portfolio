@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
@@ -12,9 +12,40 @@ const sections = [
 export default function Home() {
   const [hovered, setHovered] = useState<string | null>(null);
   const navigate = useNavigate();
+  const isNavigating = useRef(false);
+
+  const handleWheel = (e: React.WheelEvent) => {
+    if (isNavigating.current) return;
+    if (e.deltaY > 30) {
+      isNavigating.current = true;
+      navigate('/portfolio');
+    }
+  };
+
+  const touchStartY = useRef(0);
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartY.current = e.touches[0].clientY;
+  };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (isNavigating.current) return;
+    const deltaY = touchStartY.current - e.changedTouches[0].clientY;
+    if (deltaY > 50) {
+      isNavigating.current = true;
+      navigate('/portfolio');
+    }
+  };
 
   return (
-    <div className="h-screen w-full bg-[#0a0a0a] flex overflow-hidden p-4 gap-4 font-sans">
+    <motion.div 
+      className="h-screen w-full bg-[#0a0a0a] flex overflow-hidden p-4 gap-4 font-sans"
+      onWheel={handleWheel}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }}
+      transition={{ duration: 0.5 }}
+    >
       {sections.map((section) => (
         <motion.div
           key={section.id}
@@ -48,6 +79,6 @@ export default function Home() {
           </div>
         </motion.div>
       ))}
-    </div>
+    </motion.div>
   );
 }

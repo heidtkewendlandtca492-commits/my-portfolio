@@ -92,14 +92,24 @@ export default function Portfolio() {
     if (isScrolling.current) return;
     if (Math.abs(e.deltaY) < 30) return;
 
-    if (e.deltaY > 0 && activeIndex < projects.length - 1) {
-      isScrolling.current = true;
-      setActiveIndex(prev => prev + 1);
-      setTimeout(() => isScrolling.current = false, 800);
-    } else if (e.deltaY < 0 && activeIndex > 0) {
-      isScrolling.current = true;
-      setActiveIndex(prev => prev - 1);
-      setTimeout(() => isScrolling.current = false, 800);
+    if (e.deltaY > 0) {
+      if (activeIndex < projects.length - 1) {
+        isScrolling.current = true;
+        setActiveIndex(prev => prev + 1);
+        setTimeout(() => isScrolling.current = false, 800);
+      } else {
+        isScrolling.current = true;
+        navigate('/workflow');
+      }
+    } else if (e.deltaY < 0) {
+      if (activeIndex > 0) {
+        isScrolling.current = true;
+        setActiveIndex(prev => prev - 1);
+        setTimeout(() => isScrolling.current = false, 800);
+      } else {
+        isScrolling.current = true;
+        navigate('/');
+      }
     }
   };
 
@@ -112,14 +122,24 @@ export default function Portfolio() {
     const touchEndY = e.changedTouches[0].clientY;
     const deltaY = touchStartY.current - touchEndY;
 
-    if (deltaY > 50 && activeIndex < projects.length - 1) {
-      isScrolling.current = true;
-      setActiveIndex(prev => prev + 1);
-      setTimeout(() => isScrolling.current = false, 800);
-    } else if (deltaY < -50 && activeIndex > 0) {
-      isScrolling.current = true;
-      setActiveIndex(prev => prev - 1);
-      setTimeout(() => isScrolling.current = false, 800);
+    if (deltaY > 50) {
+      if (activeIndex < projects.length - 1) {
+        isScrolling.current = true;
+        setActiveIndex(prev => prev + 1);
+        setTimeout(() => isScrolling.current = false, 800);
+      } else {
+        isScrolling.current = true;
+        navigate('/workflow');
+      }
+    } else if (deltaY < -50) {
+      if (activeIndex > 0) {
+        isScrolling.current = true;
+        setActiveIndex(prev => prev - 1);
+        setTimeout(() => isScrolling.current = false, 800);
+      } else {
+        isScrolling.current = true;
+        navigate('/');
+      }
     }
   };
 
@@ -128,11 +148,15 @@ export default function Portfolio() {
   };
 
   return (
-    <div 
+    <motion.div 
       className="h-screen w-full bg-[#0a0a0a] text-white overflow-hidden relative font-sans"
       onWheel={handleWheel}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }}
+      transition={{ duration: 0.5 }}
     >
       {/* Top Navigation */}
       <div className="fixed top-0 left-0 w-full z-50 flex justify-center items-center gap-16 p-8 mix-blend-difference">
@@ -240,7 +264,7 @@ export default function Portfolio() {
           <ProjectSection key={project.id} project={project} isActive={idx === activeIndex} />
         ))}
       </motion.div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -275,27 +299,26 @@ function ProjectSection({ project, isActive }: { project: any, isActive: boolean
       </div>
 
       {/* Content Container */}
-      <div className="relative z-10 w-full max-w-[1600px] mx-auto px-8 md:px-24 flex flex-col md:flex-row items-center justify-between h-full pt-24 pb-12 gap-12">
+      <div className="relative z-10 w-full h-full flex items-center justify-center pt-24 pb-12 px-12 md:px-32">
         
-        {/* Left: Video */}
-        <div className="w-full md:w-5/12 md:ml-32 relative rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 bg-black aspect-video z-20">
+        {/* Main Video */}
+        <div className="relative w-full max-w-[70%] md:max-w-[60%] max-h-[70vh] rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 bg-black flex items-center justify-center z-20 md:mr-auto md:ml-48">
           <video 
             ref={videoRef}
             src={project.video} 
             controls
             playsInline
             loop
-            className="w-full h-full object-contain opacity-90"
+            className="w-full h-full max-h-[70vh] object-contain opacity-90"
           />
           {/* 替换视频：修改 project.video 的 URL。使用 object-contain 保证视频比例不被裁剪 */}
         </div>
 
-        {/* Right: Scattered Images */}
-        <div className="w-full md:w-6/12 h-[50vh] md:h-[70vh] relative z-30 flex items-center justify-center">
+        {/* Bottom Right: Scattered Images */}
+        <div className="absolute bottom-16 right-8 md:bottom-24 md:right-24 w-[280px] h-[200px] md:w-[440px] md:h-[280px] z-30 flex items-center justify-center">
           {/* 缩小触发区域，仅在图片堆叠的中心区域触发 */}
           <div 
-            className="relative flex items-center justify-center"
-            style={{ width: '260px', height: '180px' }}
+            className="relative flex items-center justify-center w-full h-full"
             onMouseEnter={() => setIsHoveringImages(true)}
             onMouseLeave={() => setIsHoveringImages(false)}
           >
@@ -312,10 +335,10 @@ function ProjectSection({ project, isActive }: { project: any, isActive: boolean
               
               // Calculate grid spacing based on container size
               // For 3x3, we need smaller images to fit
-              const imgWidth = is3x3 ? 160 : 260;
-              const imgHeight = is3x3 ? 110 : 180;
-              const gapX = is3x3 ? 15 : 20;
-              const gapY = is3x3 ? 15 : 20;
+              const imgWidth = is3x3 ? 120 : 190;
+              const imgHeight = is3x3 ? 85 : 135;
+              const gapX = 15;
+              const gapY = 15;
               
               // Center offset
               const offsetX = (cols - 1) / 2;
@@ -329,8 +352,8 @@ function ProjectSection({ project, isActive }: { project: any, isActive: boolean
                   key={idx}
                   className="absolute rounded-xl overflow-hidden shadow-2xl border border-white/10 bg-[#1a1a1a]"
                   style={{
-                    width: isHoveringImages ? imgWidth : (is3x3 ? 180 : 260),
-                    height: isHoveringImages ? imgHeight : (is3x3 ? 120 : 180),
+                    width: isHoveringImages ? imgWidth : (is3x3 ? 145 : 215),
+                    height: isHoveringImages ? imgHeight : (is3x3 ? 95 : 145),
                   }}
                   initial={false}
                   animate={{

@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Home as HomeIcon } from 'lucide-react';
@@ -12,9 +13,31 @@ const tools = [
 
 export default function Tools() {
   const navigate = useNavigate();
+  const isNavigating = useRef(false);
+
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      if (isNavigating.current) return;
+      const isAtTop = window.scrollY <= 0;
+
+      if (e.deltaY < -30 && isAtTop) {
+        isNavigating.current = true;
+        navigate('/workflow');
+      }
+    };
+    
+    window.addEventListener('wheel', handleWheel);
+    return () => window.removeEventListener('wheel', handleWheel);
+  }, [navigate]);
 
   return (
-    <div className="min-h-screen w-full bg-[#0a0a0a] text-white font-sans pb-24">
+    <motion.div 
+      className="min-h-screen w-full bg-[#0a0a0a] text-white font-sans pb-24"
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }}
+      transition={{ duration: 0.5 }}
+    >
       {/* Top Navigation */}
       <div className="fixed top-0 left-0 w-full z-50 flex justify-center items-center gap-16 p-8 mix-blend-difference">
         <button
@@ -42,8 +65,8 @@ export default function Tools() {
         })}
       </div>
 
-      <div className="pt-32 px-8 md:px-24 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+      <div className="pt-32 px-8 md:px-16 max-w-[1600px] mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
           {tools.map((tool, idx) => (
             <motion.div 
               key={idx}
@@ -74,6 +97,6 @@ export default function Tools() {
           ))}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Home as HomeIcon } from 'lucide-react';
@@ -14,9 +15,35 @@ const images = [
 
 export default function Workflow() {
   const navigate = useNavigate();
+  const isNavigating = useRef(false);
+
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      if (isNavigating.current) return;
+      const isAtTop = window.scrollY <= 0;
+      const isAtBottom = Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 10;
+
+      if (e.deltaY < -30 && isAtTop) {
+        isNavigating.current = true;
+        navigate('/portfolio');
+      } else if (e.deltaY > 30 && isAtBottom) {
+        isNavigating.current = true;
+        navigate('/tools');
+      }
+    };
+    
+    window.addEventListener('wheel', handleWheel);
+    return () => window.removeEventListener('wheel', handleWheel);
+  }, [navigate]);
 
   return (
-    <div className="min-h-screen w-full bg-[#0a0a0a] text-white font-sans pb-24">
+    <motion.div 
+      className="min-h-screen w-full bg-[#0a0a0a] text-white font-sans pb-24"
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }}
+      transition={{ duration: 0.5 }}
+    >
       {/* Top Navigation */}
       <div className="fixed top-0 left-0 w-full z-50 flex justify-center items-center gap-16 p-8 mix-blend-difference">
         <button
@@ -44,8 +71,8 @@ export default function Workflow() {
         })}
       </div>
 
-      <div className="pt-32 px-8 md:px-24 max-w-7xl mx-auto">
-        <div className="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8">
+      <div className="pt-32 px-8 md:px-16 max-w-[1600px] mx-auto">
+        <div className="columns-1 md:columns-2 gap-12 space-y-12">
           {images.map((img, idx) => (
             <motion.div 
               key={idx}
@@ -62,6 +89,6 @@ export default function Workflow() {
           ))}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
