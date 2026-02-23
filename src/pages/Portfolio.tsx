@@ -8,13 +8,13 @@ const projects = [
   {
     id: 1,
     title: '神陨前年',
-    cover: '/src/public/神陨封面.png',
-    bg: '/src/public/神陨背景.png',
-    video: '/src/public/神陨演示.mp4',
+    cover: '/神陨封面.png',
+    bg: '/神陨背景.png',
+    video: '/神陨演示.mp4',
     images: [
-      '/src/public/神陨展示1.png',
-      '/src/public/神陨展示2.png',
-      '/src/public/神陨展示3.png',
+      '/神陨展示1.png',
+      '/神陨展示2.png',
+      '/神陨展示3.png',
     ]
   },
   {
